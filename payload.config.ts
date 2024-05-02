@@ -1,5 +1,5 @@
 import path from 'path'
-// import { postgresAdapter } from '@payloadcms/db-postgres'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { en } from 'payload/i18n/en'
 import {
   AlignFeature,
@@ -39,7 +39,19 @@ export default buildConfig({
         delete: () => false,
         update: () => false,
       },
-      fields: [],
+      fields: [
+        {
+          type: 'select',
+          name: 'role',
+          options: ['admin', 'dev'],
+          required: true,
+        },
+        {
+          type: 'text',
+          name: 'fullName',
+          required: true,
+        },
+      ],
     },
     {
       slug: 'pages',
@@ -72,14 +84,14 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // db: postgresAdapter({
-  //   pool: {
-  //     connectionString: process.env.POSTGRES_URI || ''
-  //   }
-  // }),
-  db: mongooseAdapter({
-    url: process.env.MONGODB_URI || '',
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.POSTGRES_URI || '',
+    },
   }),
+  // db: mongooseAdapter({
+  //   url: process.env.MONGODB_URI || '',
+  // }),
 
   /**
    * Payload can now accept specific translations from 'payload/i18n/en'
@@ -108,6 +120,8 @@ export default buildConfig({
         data: {
           email: 'dev@payloadcms.com',
           password: 'test',
+          role: 'admin',
+          fullName: 'Jon Snow',
         },
       })
     }
